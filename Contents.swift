@@ -1,5 +1,7 @@
 import UIKit
 
+//テストで書きました
+var kosuke = 300
 //入れるお金
 var inputedYen:Int = 200
 //飲み物を選択　※Drink.water,Drink.coffee or Drink.energyDrinkで選択する
