@@ -19,30 +19,49 @@ struct DrinkModel {
     var stock: Int
 }
 
-enum MoneyType: Int {
-    case oneYen = 1
-    case fiveYen = 5
-    case tenYen = 10
-    case fiftyYen = 50
-    case onehundredYen = 100
-    case fivehundredYen = 500
-    case onethousandYen = 1000
+
+struct calculateMoney {
     
-//    var value: Int {
-//        switch self {
-//        case .oneYen: return 1
-//        case .fiveYen: return 5
-//        case .tenYen: return 10
-//        case .fiftyYen: return 50
-//        case .onehundredYen: return 100
-//        case .fivehundredYen: return 500
-//        case .onethousandYen: return 1000
-//        }
-//    }
+    enum Money: Int {
+        case oneYen = 1
+        case fiveYen = 5
+        case tenYen = 10
+        case fiftyYen = 50
+        case onehundredYen = 100
+        case fivehundredYen = 500
+        case onethousandYen = 1000
+    }
     
+    func MoneyCount(moneyType: Money,count: Int) -> Int {
+        switch moneyType {
+        case .oneYen:
+            return Money.oneYen.rawValue * count
+        case .fiveYen:
+            return Money.fiveYen.rawValue * count
+        case .tenYen:
+            return Money.tenYen.rawValue * count
+        case .fiftyYen:
+            return Money.fiftyYen.rawValue * count
+        case .onehundredYen:
+            return Money.onehundredYen.rawValue * count
+        case .fivehundredYen:
+            return Money.fivehundredYen.rawValue * count
+        case .onethousandYen:
+            return Money.onethousandYen.rawValue * count
+        }
+        
+    }
 }
 
-//var inputedYen: Int = 0
+let calculate = calculateMoney()
+//何円を何枚使用するか入力
+let oneYenCalculate = calculate.MoneyCount(moneyType: .oneYen, count: 2)
+let fiveYenCalculate = calculate.MoneyCount(moneyType: .fiveYen, count: 2)
+let tenYenCalculate = calculate.MoneyCount(moneyType: .tenYen, count: 2)
+let fiftyYenCalculate = calculate.MoneyCount(moneyType: .fiftyYen, count: 2)
+let onehundredYenCalculate = calculate.MoneyCount(moneyType: .onehundredYen, count: 2)
+let fivehundredYenCalculate = calculate.MoneyCount(moneyType: .fivehundredYen, count: 2)
+let onethousandYenCalculate = calculate.MoneyCount(moneyType: .onethousandYen, count: 2)
 
 
 protocol BuyDrinkValidatable {}
@@ -58,35 +77,33 @@ class VendingMachine: BuyDrinkValidatable {
     private var inputedYen: Int = 0
     private var coffee = DrinkModel(type: .coffee, stock: 5)
     private var water = DrinkModel(type: .water, stock: 5)
-    private var monster = DrinkModel(type: .energyDrink, stock: 5)
-    
-    var oneYenCount: Int = 0
-    var fiveYenCount: Int = 0
-    var tenYenCount: Int = 0
-    var fiftyYenCount: Int = 0
-    var onehundredYenCount: Int = 0
-    var fivehundredYenCount: Int = 0
-    var onethousandYenCount: Int = 0
+    private var energyDrink = DrinkModel(type: .energyDrink, stock: 5)
     
     var change: Int = 0
     
+    //使用不可のお金が入力されているか判別
     func selectDisabledMoney() -> Bool {
-        guard oneYenCount > 0 || fiveYenCount > 0 else {
+        guard oneYenCalculate > 0 || fiveYenCalculate > 0 else {
             return false
         }
         return true
     }
     
-    func MoneyCount(money: MoneyType,count: Int) -> Int {
-        switch money {
-        case .oneYen {
-            count = oneYenCount
-            money * count
+//使用不可のお金は出力して、使用可能なお金はinputedYenとして代入する
+    func checkInputedYen() {
+        if selectDisabledMoney() {
+            inputedYen = tenYenCalculate + fiftyYenCalculate + onehundredYenCalculate + fivehundredYenCalculate + onethousandYenCalculate
+            print("1円と5円は使用できません。\(oneYenCalculate + fiveYenCalculate)円お返しします。")
+        }else{
+            inputedYen = tenYenCalculate + fiftyYenCalculate + onehundredYenCalculate + fivehundredYenCalculate + onethousandYenCalculate
         }
-        }
-        money * count
     }
+
+
+
+
     func buyDrink(type: DrinkType, inputedYen: Int) -> Bool {
+        checkInputedYen()
         switch type {
         case .coffee:
             let isBuyable = validateDrinkBuyable(with: coffee, inputYen: inputedYen)
@@ -101,7 +118,7 @@ class VendingMachine: BuyDrinkValidatable {
             }
             return isBuyable
         case .energyDrink:
-            let isBuyable = validateDrinkBuyable(with: monster, inputYen: inputedYen)
+            let isBuyable = validateDrinkBuyable(with: energyDrink, inputYen: inputedYen)
             if isBuyable {
                 reduceStock(type: type)
             }
@@ -113,15 +130,15 @@ class VendingMachine: BuyDrinkValidatable {
         switch type {
         case .coffee: coffee.stock -= 1
         case .water: water.stock -= 1
-        case .energyDrink: monster.stock -= 1
+        case .energyDrink: energyDrink.stock -= 1
         }
     }
 }
 
-let moveVendingMachine = VendingMachine()
-let isSuccessToBuy = moveVendingMachine.buyDrink(type: .coffee, inputedYen: 200)
-
-print(isSuccessToBuy)
+//let activateVendingMachine = VendingMachine()
+//let isSuccessToBuy = activateVendingMachine.buyDrink(type: .coffee, inputedYen: tenYenCalculate + fiftyYenCalculate + onehundredYenCalculate + fivehundredYenCalculate + onethousandYenCalculate)
+//
+//print(isSuccessToBuy)
 
 
 
